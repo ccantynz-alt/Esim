@@ -28,12 +28,22 @@ checkout runs in **preview mode** (simulated orders, no payment taken).
 | Destination pages | `/esim/{country}` | ~190 statically generated SEO money pages with Product/FAQ/Breadcrumb schema and per-GB pricing |
 | All destinations | `/destinations` | Filterable by region + search |
 | Content pages | `/how-it-works`, `/compatibility`, `/help` | FAQ schema on each |
-| Customer dashboard | `/dashboard` | eSIM usage bars, top-ups, orders, account (demo data) |
-| Admin dashboard | `/admin` | Revenue stats, orders, plan catalog, customers (demo data) |
-| Checkout API | `POST /api/checkout` | Stripe Checkout session, or simulated order in preview mode |
-| Stripe webhook | `POST /api/webhooks/stripe` | Signature-verified; fulfillment stub ready for the eSIM supplier API |
+| Customer auth | `/login` | Passwordless demo sign-in (swap for magic links/OAuth at launch) |
+| Customer dashboard | `/dashboard` | Real eSIM lifecycle: install QR, live usage, **top-ups/recharges**, activate, orders, account |
+| Admin dashboard | `/admin` | Live revenue/orders/customers, eSIM fleet (deactivate, resend QR), one-click refunds |
+| Admin monitoring | `/admin/monitoring` | Health checks (provider, Stripe, auth, store) + full event log |
+| Checkout API | `POST /api/checkout` | New eSIM **and top-up** orders; Stripe Checkout or simulated in preview mode |
+| Stripe webhook | `POST /api/webhooks/stripe` | Signature-verified, idempotent; fulfills through the same path as preview checkout |
+| Provider adapter | `lib/provider.ts` | `EsimProvider` interface + mock simulation; the real supplier plugs in here |
+| Health endpoint | `GET /api/health` | Machine-readable status for uptime monitors |
 | AI search | `/llms.txt`, `/llm-info`, `/api/plans` | llms.txt, assistant facts page, machine-readable plan feed |
 | SEO infra | `/sitemap.xml`, `/robots.txt` | Full sitemap; AI crawlers explicitly allowed |
+
+**The full purchase lifecycle works today** (in preview mode): browse → buy →
+QR code issued → install → activate → live usage tracking → top up → admin
+can refund/deactivate/monitor everything. Two simulation layers keep it safe:
+Stripe (inert until keys exist) and the mock eSIM provider (until the supplier
+contract is signed). Both flip on without touching the rest of the code.
 
 ## Going live with Stripe
 
@@ -47,10 +57,13 @@ payments stay off until the site is finished):
 
 ## Before launch (the honest list)
 
-- [ ] Final brand name + domain → `lib/site.ts`
-- [ ] Real eSIM supplier API → replace `lib/plans.ts` pricing engine and the `fulfillOrder` stub in the webhook
-- [ ] Auth + database → replace `lib/demo-data.ts`; **gate `/admin` behind auth**
-- [ ] Email delivery (QR codes) — e.g. Resend/Postmark from the webhook
+- [ ] Register layova.travel → set `NEXT_PUBLIC_SITE_URL`
+- [ ] Real eSIM supplier API → implement `EsimProvider` in `lib/provider.ts` and source prices in `lib/plans.ts` from the supplier rate sheet
+- [ ] Database → reimplement `lib/db.ts` over Postgres/Neon (file/in-memory store resets on serverless cold starts; the repository interface is the contract)
+- [ ] Real auth → replace the passwordless demo login with magic links/OAuth; set `AUTH_SECRET` + `ADMIN_PASSWORD` env vars
+- [ ] Email delivery (QR codes, low-data alerts) — e.g. Resend/Postmark, hooks marked TODO in `lib/fulfill.ts` and `app/admin/actions.ts`
+- [ ] Stripe live keys (last switch to flip)
+- [ ] Point an uptime monitor at `/api/health`
 - [ ] Run the launch-week checklist in [docs/SEO-PLAYBOOK.md](docs/SEO-PLAYBOOK.md)
 
 ## Docs
