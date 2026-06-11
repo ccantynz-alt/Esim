@@ -11,6 +11,8 @@ import {
   breadcrumbLd,
 } from "@/components/JsonLd";
 import { site } from "@/lib/site";
+import { corridors, getCorridorBySlug } from "@/lib/corridors";
+import { CorridorPage } from "@/components/CorridorPage";
 
 /**
  * Programmatic SEO: one statically generated landing page per destination,
@@ -18,7 +20,10 @@ import { site } from "@/lib/site";
  */
 
 export function generateStaticParams() {
-  return countries.map((c) => ({ slug: c.slug }));
+  return [
+    ...countries.map((c) => ({ slug: c.slug })),
+    ...corridors.map((c) => ({ slug: c.slug })),
+  ];
 }
 
 export const dynamicParams = false;
@@ -27,6 +32,19 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const corridor = getCorridorBySlug(slug);
+  if (corridor) {
+    return {
+      title: corridor.title,
+      description: corridor.intro,
+      alternates: { canonical: `/esim/${corridor.slug}` },
+      openGraph: {
+        title: corridor.title,
+        description: corridor.intro,
+        url: `/esim/${corridor.slug}`,
+      },
+    };
+  }
   const country = getCountryBySlug(slug);
   if (!country) return {};
   const cheapest = plansForCountry(country)[0];
@@ -42,6 +60,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CountryPage({ params }: Props) {
   const { slug } = await params;
+  const corridor = getCorridorBySlug(slug);
+  if (corridor) return <CorridorPage corridor={corridor} />;
   const country = getCountryBySlug(slug);
   if (!country) notFound();
 

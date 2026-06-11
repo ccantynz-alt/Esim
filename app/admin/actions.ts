@@ -7,6 +7,8 @@ import {
   getEsim,
   updateOrder,
   updateEsim,
+  updateLeadStatus,
+  LeadStatus,
   logEvent,
 } from "@/lib/db";
 import { getProvider } from "@/lib/provider";
@@ -58,6 +60,14 @@ export async function deactivateEsimAction(formData: FormData) {
   updateEsim(esim.id, { deactivated: true });
   logEvent("warn", "esim.deactivated", `eSIM ${esim.iccid} deactivated by admin`);
   revalidatePath("/admin");
+}
+
+export async function updateLeadStatusAction(formData: FormData) {
+  await requireAdmin();
+  const status = String(formData.get("status") ?? "") as LeadStatus;
+  if (!["new", "contacted", "won", "lost"].includes(status)) return;
+  updateLeadStatus(String(formData.get("leadId") ?? ""), status);
+  revalidatePath("/admin/partners");
 }
 
 export async function resendQrAction(formData: FormData) {
