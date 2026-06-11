@@ -1,18 +1,18 @@
 /**
  * Single source of truth for brand + site identity.
- * The brand name is a working title — swap it here once the final
- * name is chosen from docs/COMPETITOR-AUDIT.md and the change
- * propagates everywhere (metadata, JSON-LD, llms.txt, emails).
+ * Brand: Layova (from "layover") — vetted June 2026: no existing brand,
+ * app, or eSIM service collisions found. Primary domain: layova.travel
+ * (register layova.shop / layova.online as defensive redirects).
  */
 export const site = {
-  name: "Voyamo",
-  legalName: "Voyamo Ltd",
+  name: "Layova",
+  legalName: "Layova Ltd",
   tagline: "Instant eSIM data in 190+ countries",
   description:
-    "Voyamo gives travelers instant eSIM data plans in 190+ countries. Scan a QR code, connect in seconds, and skip roaming fees forever. No physical SIM, no contracts, no surprises.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.voyamo.com",
-  twitter: "@voyamo",
-  supportEmail: "support@voyamo.com",
+    "Layova gives travelers instant eSIM data plans in 190+ countries. Scan a QR code, connect in seconds, and skip roaming fees forever. No physical SIM, no contracts, no surprises.",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.layova.travel",
+  twitter: "@layova",
+  supportEmail: "support@layova.travel",
   countryCount: 190,
 } as const;
 

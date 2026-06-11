@@ -138,7 +138,7 @@
 9. **Wyfar** — "wayfarer" compressed; Gen-Z skew.
 10. **Pakkit** — pun on data packets + packing; playful (riskiest legally).
 
-Also in this codebase: the working title **Voyamo** (voyage + amo) — same winning pattern; swap in `lib/site.ts` once the final choice clears trademark/domain checks.
+**Chosen (June 2026): Layova** (#1 above) at **layova.travel** — vetted with no existing brand/app/eSIM collisions found. Configured in `lib/site.ts`.
 
 ### 5b. The hero formula to beat them
 Combine Airalo's destination-search with Saily's price-anchoring and Holafly's simplicity — none of them do all three:

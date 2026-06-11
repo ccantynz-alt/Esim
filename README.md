@@ -1,12 +1,13 @@
-# Voyamo — travel eSIM store
+# Layova — travel eSIM store
 
 A premium eSIM e-commerce site: instant prepaid data plans in 190+ countries,
 built with Next.js (App Router), Tailwind CSS v4, and Stripe.
 
-> **Brand note:** "Voyamo" is a working title. Shortlisted alternatives and the
-> full market analysis live in [docs/COMPETITOR-AUDIT.md](docs/COMPETITOR-AUDIT.md) §5a.
-> To rename: edit `lib/site.ts` — everything (metadata, JSON-LD, llms.txt, footer)
-> derives from it.
+> **Brand:** Layova (from "layover"), primary domain **layova.travel** —
+> vetted June 2026 with no existing brand/app/eSIM collisions (see
+> [docs/COMPETITOR-AUDIT.md](docs/COMPETITOR-AUDIT.md) §5a). All identity
+> lives in `lib/site.ts`; metadata, JSON-LD, llms.txt and the footer derive
+> from it.
 
 ## Quick start
 
