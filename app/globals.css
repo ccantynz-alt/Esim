@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette — deep "midnight" base with an aurora accent range. */
+  --color-ink-950: #060814;
+  --color-ink-900: #0a0e1f;
+  --color-ink-800: #111733;
+  --color-ink-700: #1a2247;
+  --color-ink-600: #28335f;
+
+  --color-aurora-400: #34e0c8;
+  --color-aurora-500: #14c9b2;
+  --color-violet-glow: #7c6cff;
+  --color-sky-glow: #4cc3ff;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-ink-950);
+  color: #f4f6ff;
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-aurora-500);
+  color: var(--color-ink-950);
+}
+
+/* Aurora backdrop used by the hero and page headers. */
+.aurora {
+  background:
+    radial-gradient(60rem 30rem at 15% -10%, rgb(124 108 255 / 0.35), transparent 60%),
+    radial-gradient(50rem 28rem at 85% -5%, rgb(76 195 255 / 0.28), transparent 60%),
+    radial-gradient(70rem 36rem at 50% 110%, rgb(20 201 178 / 0.18), transparent 60%);
+}
+
+/* Subtle dotted "world map" texture behind hero content. */
+.starfield {
+  background-image: radial-gradient(rgb(255 255 255 / 0.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 35%, black 30%, transparent 75%);
+}
+
+.glass {
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.10);
+  backdrop-filter: blur(12px);
+}
+
+.glass-hover:hover {
+  background: rgb(255 255 255 / 0.09);
+  border-color: rgb(255 255 255 / 0.18);
+}
+
+.text-gradient {
+  background: linear-gradient(95deg, #fff 20%, var(--color-sky-glow) 55%, var(--color-aurora-400) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-primary {
+  background: linear-gradient(92deg, var(--color-violet-glow), var(--color-sky-glow));
+  color: white;
+  transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 8px 30px rgb(124 108 255 / 0.35);
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgb(124 108 255 / 0.45);
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
