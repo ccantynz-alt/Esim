@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getPlanById, formatData, formatPrice } from "@/lib/plans";
+import QRCode from "qrcode";
+import { getOrder, getEsim } from "@/lib/db";
+import { getCountryByCode } from "@/lib/countries";
+import { formatData, formatPrice, getPlanById } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Order confirmed",
@@ -8,46 +11,86 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ plan?: string; simulated?: string; session_id?: string }>;
+  searchParams: Promise<{ order?: string; simulated?: string }>;
 };
 
 export default async function CheckoutSuccessPage({ searchParams }: Props) {
-  const { plan: planId, simulated } = await searchParams;
-  const found = planId ? getPlanById(planId) : undefined;
+  const { order: orderId, simulated } = await searchParams;
+  const order = orderId ? getOrder(orderId) : undefined;
+  const esim = order?.esimId ? getEsim(order.esimId) : undefined;
+  const country = order ? getCountryByCode(order.countryCode) : undefined;
+  const qrDataUrl =
+    esim && order?.kind === "new"
+      ? await QRCode.toDataURL(esim.activationCode, {
+          width: 220,
+          margin: 1,
+          color: { dark: "#0a0e1f", light: "#ffffff" },
+        })
+      : null;
 
   return (
     <section className="aurora min-h-[70vh]">
-      <div className="mx-auto max-w-2xl px-4 py-24 text-center sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-aurora-500/20 text-3xl">
           ✅
         </div>
         <h1 className="mt-6 text-4xl font-bold tracking-tight">
-          {simulated ? "Test order complete" : "You're all set!"}
+          {order?.kind === "topup" ? "Top-up applied!" : "You're all set!"}
         </h1>
+        {simulated && (
+          <p className="mx-auto mt-3 w-fit rounded-full bg-amber-400/10 px-4 py-1.5 text-xs text-amber-300">
+            Preview mode — no payment was taken (Stripe keys not configured)
+          </p>
+        )}
 
-        {found ? (
+        {order && country ? (
           <div className="glass mx-auto mt-8 max-w-md rounded-2xl p-6 text-left">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">{found.country.flag}</span>
+              <span className="text-3xl">{country.flag}</span>
               <div>
                 <div className="font-semibold">
-                  {found.country.name} eSIM — {found.plan.label}
+                  {country.name} —{" "}
+                  {order.kind === "topup" ? "Top-up" : order.planLabel}
                 </div>
                 <div className="text-sm text-white/55">
-                  {formatData(found.plan.dataGb)} · {found.plan.days} days ·{" "}
-                  {formatPrice(found.plan.priceUsd)}
+                  {formatPrice(order.amountUsd)} · order {order.id.slice(0, 8)}
                 </div>
               </div>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">
-              {simulated
-                ? "This was a simulated checkout — Stripe keys aren't configured yet, so no payment was taken. Once Stripe goes live, the QR code is emailed here instead."
-                : "Your QR code is on its way to your inbox and is also available in your dashboard. Install it on WiFi before you fly."}
-            </p>
+
+            {qrDataUrl && esim && (
+              <div className="mt-6 rounded-xl bg-white/5 p-5 text-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrDataUrl}
+                  alt={`eSIM activation QR code for ${country.name}`}
+                  className="mx-auto rounded-lg bg-white p-2"
+                  width={180}
+                  height={180}
+                />
+                <p className="mt-3 font-mono text-[11px] text-white/45">
+                  ICCID {esim.iccid}
+                </p>
+                <p className="mt-3 text-xs leading-relaxed text-white/55">
+                  Scan with your phone camera, or go to Settings → Cellular →
+                  Add eSIM. Install on WiFi before you fly — data activates
+                  automatically when you land.
+                </p>
+              </div>
+            )}
+
+            {order.kind === "topup" && esim && (
+              <p className="mt-4 text-sm leading-relaxed text-white/60">
+                {formatData(getPlanById(order.planId)?.plan.dataGb ?? 0)} of
+                top-up data has been added to eSIM{" "}
+                <span className="font-mono text-xs">{esim.iccid}</span> — no
+                reinstall needed.
+              </p>
+            )}
           </div>
         ) : (
           <p className="mt-6 text-white/60">
-            Your order is confirmed. Check your email for the eSIM QR code.
+            Your order is confirmed. View your eSIM in the dashboard.
           </p>
         )}
 
@@ -56,7 +99,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             Go to my eSIMs
           </Link>
           <Link href="/destinations" className="glass glass-hover rounded-full px-6 py-3 text-sm">
-            Browse more destinations
+            Browse destinations
           </Link>
         </div>
       </div>
