@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/esims", label: "eSIMs" },
   { href: "/admin/customers", label: "Customers" },
+  { href: "/admin/partners", label: "Partners" },
   { href: "/admin/monitoring", label: "Monitoring" },
   { href: "/admin/plans", label: "Plans & pricing" },
 ];

@@ -54,6 +54,21 @@ export interface EsimRec {
   createdAt: string;
 }
 
+export type LeadStatus = "new" | "contacted" | "won" | "lost";
+
+export interface PartnerLeadRec {
+  id: string;
+  company: string;
+  contactName: string;
+  email: string;
+  segment: string;
+  /** Free-text need + quote summary captured from the quote builder. */
+  details: string;
+  estMonthlyTravelers?: number;
+  status: LeadStatus;
+  createdAt: string;
+}
+
 export interface EventRec {
   id: string;
   ts: string;
@@ -67,6 +82,7 @@ interface Store {
   orders: OrderRec[];
   esims: EsimRec[];
   events: EventRec[];
+  leads?: PartnerLeadRec[];
 }
 
 const DATA_FILE = path.join(process.cwd(), ".data", "store.json");
@@ -221,6 +237,42 @@ export function getEsim(id: string): EsimRec | undefined {
 export function listEsims(email?: string): EsimRec[] {
   const esims = getStore().esims;
   return email ? esims.filter((e) => e.email === email) : [...esims];
+}
+
+// ---- Partner leads (B2B pipeline) ----
+
+export function createLead(
+  input: Omit<PartnerLeadRec, "id" | "status" | "createdAt">,
+): PartnerLeadRec {
+  const store = getStore();
+  const lead: PartnerLeadRec = {
+    ...input,
+    id: randomUUID(),
+    status: "new",
+    createdAt: new Date().toISOString(),
+  };
+  store.leads = [lead, ...(store.leads ?? [])];
+  logEvent("info", "lead.created", `B2B lead: ${lead.company} (${lead.segment}) — ${lead.email}`);
+  persist(store);
+  return lead;
+}
+
+export function listLeads(): PartnerLeadRec[] {
+  return [...(getStore().leads ?? [])];
+}
+
+export function updateLeadStatus(
+  id: string,
+  status: LeadStatus,
+): PartnerLeadRec | undefined {
+  const store = getStore();
+  const lead = (store.leads ?? []).find((l) => l.id === id);
+  if (lead) {
+    lead.status = status;
+    logEvent("info", "lead.status", `Lead ${lead.company} → ${status}`);
+    persist(store);
+  }
+  return lead;
 }
 
 export function listEvents(limit = 100): EventRec[] {

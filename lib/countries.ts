@@ -42,7 +42,7 @@ const REGION_CODES: Record<Region, string[]> = {
     "NE", "NG", "RW", "ST", "SN", "SC", "SL", "SO", "ZA", "SS", "SD", "TZ",
     "TG", "TN", "UG", "ZM", "ZW", "RE", "ER",
   ],
-  Oceania: ["AS", "AU", "FJ", "PF", "GU", "KI", "NR", "NC", "NZ", "PW", "PG", "WS", "SB", "TO", "TV", "VU", "FM", "MH"],
+  Oceania: ["AS", "AU", "CK", "FJ", "PF", "GU", "KI", "NR", "NC", "NU", "NZ", "PW", "PG", "WS", "SB", "TO", "TV", "VU", "FM", "MH"],
   "Middle East": [
     "BH", "IR", "IQ", "IL", "JO", "KW", "LB", "OM", "PS", "QA", "SA", "SY",
     "TR", "AE", "YE",
